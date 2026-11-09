@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>رحلة صائد الكنز في مدينة الأعداد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--sea:#0e7c86;--sand:#ffe9b0;--gold:#ffc82e;--ink:#3b2a14;--leaf:#2e9e5b;--red:#e5533d;--card:#fffaf0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Cairo,Tahoma,sans-serif;background:linear-gradient(#9fe3ee,#ffe9b0 70%);color:var(--ink);font-weight:600}
+#app{max-width:720px;margin:0 auto;padding:12px}
+.s{background:var(--card);border:4px solid var(--ink);border-radius:24px;padding:18px;text-align:center;box-shadow:0 6px 0 var(--ink);position:relative;overflow:hidden}
+.s[hidden]{display:none}
+h1{font-size:clamp(24px,6vw,38px);margin:6px 0;font-weight:800;color:var(--sea);line-height:1.4}
+h2{font-size:22px;margin:6px 0;font-weight:800}
+p{font-size:18px;margin:6px 0;line-height:1.7}
+button{font-family:inherit;cursor:pointer}
+.btn{font-size:24px;font-weight:800;color:var(--ink);background:var(--gold);border:4px solid var(--ink);border-radius:18px;padding:12px 30px;box-shadow:0 5px 0 var(--ink);margin:10px 4px;min-height:56px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn:focus-visible,.opt:focus-visible{outline:4px solid var(--sea);outline-offset:3px}
+.hero{display:flex;justify-content:center;align-items:flex-end;gap:10px}
+.hero svg{width:110px}
+.hero .chest{width:130px}
+.nodes{display:flex;justify-content:space-between;align-items:center;margin:14px 0}
+.node{width:78px;height:78px;border-radius:50%;border:4px solid var(--ink);background:#ddd;font-size:30px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:800}
+.node small{font-size:12px}
+.node.cur{background:var(--gold);animation:pulse 1.2s infinite}
+.node.done{background:#7ddc9b}
+.dash{flex:1;border-top:5px dashed var(--ink);margin:0 4px}
+@keyframes pulse{50%{transform:scale(1.1)}}
+.hud{display:flex;justify-content:space-between;align-items:center;font-size:17px;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.pill{background:var(--sand);border:3px solid var(--ink);border-radius:14px;padding:2px 12px;font-weight:800}
+.bar{height:16px;background:#e6d9b8;border:3px solid var(--ink);border-radius:10px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--leaf);transition:width .4s}
+#tb i{background:var(--sea);transition:width 1s linear}
+#tb.low i{background:var(--red)}
+.tag{display:inline-block;background:var(--sea);color:#fff;border-radius:12px;padding:2px 14px;font-size:15px}
+#qt{font-size:clamp(20px,5vw,26px);font-weight:800;margin:10px 0;line-height:1.7;min-height:60px}
+.opts{display:grid;gap:10px;margin:10px 0}
+.opt{font-size:22px;font-weight:800;color:var(--ink);background:#fff;border:4px solid var(--ink);border-radius:16px;padding:12px;min-height:58px;box-shadow:0 4px 0 var(--ink)}
+.opt:disabled{opacity:.5;cursor:default}
+.opt.good{background:#7ddc9b;opacity:1}
+.opt.bad{background:#ffb3a7}
+.opt.sel{background:var(--gold)}
+.tf{grid-template-columns:1fr 1fr}
+.mt{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
+#fb{min-height:64px;margin:8px 0;padding:10px;border-radius:16px;font-size:19px;font-weight:800}
+#fb.ok{background:#d6f7e0;border:3px solid var(--leaf)}
+#fb.no{background:#ffe3dc;border:3px solid var(--red)}
+#fb:empty{display:none}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.star{position:fixed;font-size:30px;pointer-events:none;z-index:9;animation:fly 1.4s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),-260px) rotate(360deg);opacity:0}}
+.badge{display:inline-flex;flex-direction:column;align-items:center;background:var(--sand);border:4px solid var(--ink);border-radius:20px;padding:10px 16px;margin:6px;font-size:18px;font-weight:800;min-width:130px}
+.badge b{font-size:44px}
+.big{font-size:56px;font-weight:800;color:var(--sea)}
+.sm{font-size:16px;padding:8px 18px;min-height:44px}
+.inp{font-family:inherit;font-size:24px;font-weight:800;text-align:center;width:100%;max-width:360px;padding:12px;border:4px solid var(--ink);border-radius:16px;background:#fff;color:var(--ink);margin:10px 0}
+.row{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:8px 14px;margin:8px 0;font-size:20px;font-weight:800;text-align:right}
+.row .rk{min-width:44px;font-size:30px;text-align:center}
+.row .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .pt{background:var(--sand);border:3px solid var(--ink);border-radius:12px;padding:0 12px}
+.row.g1{background:linear-gradient(#fff3b0,#ffd447);transform:scale(1.03)}
+.row.g2{background:linear-gradient(#f4f6f8,#c4ccd4)}
+.row.g3{background:linear-gradient(#ffe0c2,#d9915a)}
+.row.me{outline:4px solid var(--sea)}
+.note{font-size:15px;color:#7a431a}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:480px){.mt{gap:8px 10px}.opt{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<section class="s" id="home">
+  <div class="hero">
+    <svg viewBox="0 0 100 110" aria-hidden="true"><ellipse cx="50" cy="38" rx="42" ry="9" fill="#a0642b"/><path d="M24 36q2-28 26-28t26 28z" fill="#c98a3d"/><rect x="24" y="30" width="52" height="6" fill="#7a431a"/><circle cx="50" cy="55" r="20" fill="#ffd2a1"/><circle cx="43" cy="53" r="3" fill="#333"/><circle cx="57" cy="53" r="3" fill="#333"/><path d="M42 62q8 8 16 0" stroke="#333" stroke-width="2.5" fill="none"/><rect x="28" y="76" width="44" height="30" rx="12" fill="#2e9e5b"/></svg>
+    <svg class="chest" viewBox="0 0 100 80" aria-hidden="true"><path d="M10 35q0-25 40-25t40 25z" fill="#b5651d"/><rect x="10" y="35" width="80" height="38" rx="4" fill="#8a4b12"/><rect x="44" y="30" width="12" height="18" rx="3" fill="#ffd23f"/><circle cx="50" cy="40" r="3" fill="#8a4b12"/><text x="22" y="22" font-size="14">⭐</text><text x="62" y="22" font-size="14">⭐</text></svg>
+  </div>
+  <h1>رحلة صائد الكنز في مدينة الأعداد</h1>
+  <p>لحل أسرار القسمة ومساعدة أصدقائنا في توزيع الأشياء والحصول على الكنوز 🗺️</p>
+  <p>٣ مستويات • ٣٠ ثانية لكل سؤال • ١٠ نقاط لكل إجابة صحيحة</p>
+  <button class="btn" id="start">ابدأ الرحلة 🧭</button>
+  <button class="btn" id="lbo" style="background:#fff">لوحة الصدارة 🏆</button>
+</section>
+
+<section class="s" id="map" hidden>
+  <h2>خريطة الرحلة 🗺️</h2>
+  <div class="nodes" id="nodes"></div>
+  <h1 id="mname"></h1>
+  <p id="mgoal"></p>
+  <p>اجمع ٥٠ نقطة على الأقل لتنتقل للمستوى التالي وتنال شارتك!</p>
+  <button class="btn" id="go">انطلق! 🚀</button>
+</section>
+
+<section class="s" id="game" hidden>
+  <div class="hud"><span class="pill" id="hl"></span><span class="pill" id="hp"></span><span class="pill" id="ht"></span></div>
+  <div class="bar" id="pb"><i></i></div>
+  <div class="bar" id="tb"><i></i></div>
+  <span class="tag" id="qtag"></span>
+  <div id="qt"></div>
+  <div id="qa"></div>
+  <div id="fb" role="status" aria-live="polite"></div>
+  <button class="btn" id="next" hidden>السؤال التالي ➜</button>
+</section>
+
+<section class="s" id="lend" hidden>
+  <div class="big" id="lemoji"></div>
+  <h1 id="ltitle"></h1>
+  <p id="ltxt"></p>
+  <div id="lbadge"></div>
+  <button class="btn" id="lbtn"></button>
+</section>
+
+<section class="s" id="fin" hidden>
+  <div class="big">🏆</div>
+  <h1>مبروك! وصلت إلى الكنز!</h1>
+  <p>مجموع نقاطك</p>
+  <div class="big" id="ftotal"></div>
+  <p>الشارات التي حصلت عليها</p>
+  <div id="fbadges"></div>
+  <button class="btn" id="again">العب من جديد 🔁</button>
+  <button class="btn" id="lbo2" style="background:#fff">لوحة الصدارة 🏆</button>
+</section>
+
+<section class="s" id="nm" hidden>
+  <div class="big">🧢</div>
+  <h1>ما اسمك يا صائد الكنز؟</h1>
+  <p>سيظهر اسمك في لوحة الصدارة</p>
+  <input class="inp" id="pname" maxlength="20" placeholder="اكتب اسمك هنا" autocomplete="off">
+  <div id="nerr" class="note"></div>
+  <button class="btn" id="nok">انطلق! 🚀</button>
+  <button class="btn sm" id="nback" style="background:#fff">رجوع</button>
+</section>
+
+<section class="s" id="lb" hidden>
+  <h1>🏆 لوحة الصدارة</h1>
+  <div id="lbl"></div>
+  <p class="note" id="lbn"></p>
+  <button class="btn" id="lbb">العودة إلى اللعبة ➜</button>
+</section>
+
+</div>
+<script>
+const L=[
+{n:'رحلة استكشاف عناصر القسمة',b:'مبتدئ الأرقام',e:'🔍',g:'المستوى الأول: أساسيات ومفاهيم القسمة',q:[
+{t:'mc',q:'في العملية الحسابية 12 ÷ 3 = 4 ، ماذا يسمى العدد (3)؟',o:['المقسوم','المقسوم عليه','خارج القسمة'],a:1,h:'تذكر: العدد الذي نقسم عليه يسمى المقسوم عليه.'},
+{t:'tf',q:'في جملة القسمة، العدد الكبير الذي يتم توزيعه يسمى "المقسوم".',a:true,h:'تذكر أن العدد الكلي المُراد توزيعه هو المقسوم.'},
+{t:'mt',q:'في 12 ÷ 3 = 4 صِل كل اسم بالعدد المناسب:',p:[['المقسوم','12'],['المقسوم عليه','3'],['خارج القسمة','4']],h:'المقسوم هو العدد الأكبر، وخارج القسمة هو الناتج.'},
+{t:'mc',q:'لإيجاد ناتج القسمة 15 ÷ 3 = 5 نستعين بجدول ضرب العدد كم؟',o:['4','5','3'],a:2,h:'تذكر جدول ضرب المقسوم عليه لإيجاد الناتج بسهولة.'},
+{t:'tf',q:'يمكننا إيجاد خارج القسمة بالبحث في جدول ضرب المقسوم عليه.',a:true,h:'تذكر جدول ضرب المقسوم عليه لإيجاد الناتج بسهولة.'},
+{t:'mc',q:'إذا كان المقسوم والمقسوم عليه متساويين (مثل 4 ÷ 4) يكون الناتج دائماً:',o:['صفر','واحد','نفس العدد'],a:1,h:'فكّر: كم مرة يوجد العدد 4 داخل العدد 4؟'}]},
+{n:'تحدي مهندس التوزيع',b:'خبير التوزيع',e:'📐',g:'المستوى الثاني: التوزيع بالتساوي وجدول الضرب',q:[
+{t:'mc',q:'لإيجاد (نصيب الفرد) عند التوزيع بالتساوي نستخدم العلاقة:',o:['العدد الكلي ÷ عدد الأشخاص','عدد الأشخاص ÷ العدد الكلي','العدد الكلي × عدد الأشخاص'],a:0,h:'نوزّع العدد الكلي على الأشخاص، فنقسم العدد الكلي.'},
+{t:'tf',q:'في المسألة الكلامية للقسمة، الخطوة الأولى هي تحديد المعلومات المعطاة والمطلوب.',a:true,h:'ابدأ دائماً بقراءة المسألة وتحديد المعطيات والمطلوب.'},
+{t:'mc',q:'ناتج عملية القسمة 48 ÷ 6 يساوي:',o:['6','7','8'],a:2,h:'تذكر جدول ضرب المقسوم عليه (6): 6 × ؟ = 48'},
+{t:'mc',q:'عندما نستخدم رسماً توضيحياً يظهر 12 قطعة موز موزعة داخل 3 أطباق بالتساوي، فإن الجملة الحسابية المعبرة عن ذلك هي:',o:['12 + 3','12 × 3','12 ÷ 3'],a:2,h:'التوزيع بالتساوي يعني القسمة.'},
+{t:'tf',q:'الرسوم التوضيحية ونماذج الأشرطة والأطباق تساعدنا على فهم وتوضيح فكرة التوزيع بالتساوي.',a:true,h:'تخيّل الأطباق وكيف نوزّع عليها بالتساوي.'},
+{t:'mc',w:1,q:'مسألة كلامية: وزّعت ريم 20 قلماً على 4 أصدقاء بالتساوي. كم قلماً لكل صديق؟',o:['4 أقلام','5 أقلام','6 أقلام'],a:1,h:'المعطيات: 20 قلماً و4 أصدقاء. اقسم 20 ÷ 4 وتذكر جدول ضرب 4.'}]},
+{n:'معركة بطل القسمة الأسطوري',b:'بطل القسمة',e:'🛡️',g:'المستوى الثالث: التمييز والمقارنة والمسائل الكلامية',q:[
+{t:'mc',q:'إذا كانت المسألة تتحدث عن توزيع برتقال، فإن تمييز الإجابة النهائية يكون:',o:['سم','برتقالة','أشخاص'],a:1,h:'لا تنس كتابة التمييز (وحدة القياس) في نهاية الحل.'},
+{t:'tf',q:'يجب دائماً كتابة وحدة القياس (التمييز) في نهاية الإجابة النهائية للمسألة الكلامية.',a:true,h:'لا تنس كتابة التمييز (وحدة القياس) في نهاية الحل.'},
+{t:'mc',q:'لتكوين مسألة كلامية تعبر عن الجملة 8 ÷ 2، نبدأ بـ:',o:['لدينا 8 قطع حلوى','لدينا قطعتان فقط','لدينا 10 قطع'],a:0,h:'المقسوم هو 8، فنبدأ بالعدد 8.'},
+{t:'mc',q:'مع ريم 24 مكعباً، ومع سامي 6 مكعبات. عدد مكعبات ريم يساوي كم ضعفاً لمكعبات سامي؟',o:['3 أضعاف','4 أضعاف','5 أضعاف'],a:1,h:'لمعرفة عدد الأضعاف نقسم: 24 ÷ 6'},
+{t:'tf',q:'في مسائل المقارنة لإيجاد عدد الأضعاف، نستخدم عملية القسمة.',a:true,h:'عدد الأضعاف = العدد الأكبر ÷ العدد الأصغر.'},
+{t:'mc',w:1,q:'مسألة كلامية: وزّع سالم 18 برتقالة على 3 أطباق بالتساوي. ما الإجابة الصحيحة مع التمييز؟',o:['6 أطباق','6 برتقالات','15 برتقالة'],a:1,h:'18 ÷ 3 = 6، والسؤال عن البرتقال، فالتمييز هو برتقالات.'},
+{t:'mt',q:'صِل كل جملة قسمة بناتجها:',p:[['15 ÷ 3','5'],['24 ÷ 6','4'],['16 ÷ 2','8']],h:'استعن بجدول ضرب المقسوم عليه.'}]}
+];
+const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5);
+let li,qi,tot,lp,badges,tl,tm,done,cur;
+let ac;
+function tone(f,t,d,ty='sine',v=.15){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime+t;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(ac.destination);o.start(n);o.stop(n+d)}catch(e){}}
+function clap(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<14;i++){const s=ac.createBufferSource(),b=ac.createBuffer(1,1800,ac.sampleRate),d=b.getChannelData(0);for(let j=0;j<1800;j++)d[j]=(Math.random()*2-1)*(1-j/1800);s.buffer=b;const g=ac.createGain();g.gain.value=.2;s.connect(g);g.connect(ac.destination);s.start(ac.currentTime+.3+i*.07+Math.random()*.04)}}catch(e){}}
+const sGood=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*.09,.25));clap()},sBad=()=>tone(180,0,.35,'square',.08),sWin=()=>[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,i*.13,.3));
+function stars(n=14){for(let i=0;i<n;i++){const s=document.createElement('span');s.className='star';s.textContent='⭐';s.style.left=(15+Math.random()*70)+'vw';s.style.top=(45+Math.random()*30)+'vh';s.style.setProperty('--dx',(Math.random()*160-80)+'px');s.style.animationDelay=(Math.random()*.3)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),1900)}}
+function show(id){document.querySelectorAll('.s').forEach(e=>e.hidden=e.id!=id);scrollTo(0,0)}
+function newGame(){sent=false;li=0;tot=0;badges=[];intro()}
+function intro(){lp=0;qi=0;const l=L[li];$('#nodes').innerHTML=L.map((x,i)=>(i?'<span class="dash"></span>':'')+`<div class="node ${i<li?'done':i==li?'cur':''}">${i<li?'✅':x.e}<small>مستوى ${i+1}</small></div>`).join('');$('#mname').textContent=l.n;$('#mgoal').textContent=l.g;show('map')}
+function startQ(){clearInterval(tm);done=false;const l=L[li],q=l.q[qi];cur=q;$('#hl').textContent='🗺️ المستوى '+(li+1);$('#hp').textContent='⭐ '+lp+' / 50';$('#pb i').style.width=(qi/l.q.length*100)+'%';$('#qtag').textContent={mc:'اختيار من متعدد',tf:'صح أو خطأ',mt:'توصيل'}[q.t]+(q.w?' • مسألة كلامية':'');$('#qt').textContent=q.q;$('#fb').className='';$('#fb').textContent='';$('#next').hidden=true;const qa=$('#qa');qa.innerHTML='';
+if(q.t=='mc'){const box=el('div','opts');sh(q.o.map((t,i)=>[t,i])).forEach(([t,i])=>{const b=el('button','opt');b.textContent=t;b.onclick=()=>pick(b,i==q.a);box.appendChild(b)});qa.appendChild(box)}
+else if(q.t=='tf'){const box=el('div','opts tf');[[true,'✅ صح'],[false,'❌ خطأ']].forEach(([v,t])=>{const b=el('button','opt');b.textContent=t;b.onclick=()=>pick(b,v===q.a);box.appendChild(b)});qa.appendChild(box)}
+else{let sel=null,n=0;const box=el('div','mt'),A=el('div','opts'),B=el('div','opts');q.p.forEach(p=>{const b=el('button','opt');b.textContent=p[0];b.dataset.k=p[0];b.onclick=()=>{if(done||b.classList.contains('good'))return;A.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=b};A.appendChild(b)});sh(q.p).forEach(p=>{const b=el('button','opt');b.textContent=p[1];b.onclick=()=>{if(done||!sel||b.classList.contains('good'))return;if(sel.dataset.k==p[0]){sel.classList.remove('sel');sel.classList.add('good');b.classList.add('good');sel=null;tone(660,0,.15);if(++n==q.p.length)win()}else{wrong(q.h);sel.classList.remove('sel');sel=null}};B.appendChild(b)});box.append(A,B);qa.appendChild(box)}
+tl=30;tick();tm=setInterval(()=>{tl--;tick();if(tl<=0){clearInterval(tm);timeout()}},1000);show('game')}
+function el(t,c){const e=document.createElement(t);e.className=c;return e}
+function tick(){$('#ht').textContent='⏱️ '+tl;$('#tb i').style.width=(tl/30*100)+'%';$('#tb').classList.toggle('low',tl<=10)}
+function pick(b,ok){if(done)return;if(ok){b.classList.add('good');win()}else{b.classList.add('bad');b.disabled=true;wrong(cur.h)}}
+const PR=['أحسنت يا صائد الكنز! 🎉','رائع! إجابة صحيحة 🌟','عمل بطولي! 💪','ممتاز! واصل التقدم 🚀'];
+function win(){done=true;clearInterval(tm);lp+=10;tot+=10;sGood();stars();$('#hp').textContent='⭐ '+lp+' / 50';$('#fb').className='ok';const left=Math.max(0,50-lp);$('#fb').textContent=PR[Math.random()*4|0]+' +10 نقاط'+(left?` — باقي لك ${left} نقطة للترقي`:' — وصلت إلى 50 نقطة!');fin()}
+function wrong(h){sBad();const f=$('#fb');f.className='no';f.textContent='💡 حاول مرة أخرى! '+h;f.classList.add('shake');setTimeout(()=>f.classList.remove('shake'),450)}
+function timeout(){done=true;document.querySelectorAll('#qa .opt').forEach(b=>b.disabled=true);const q=cur;let a=q.t=='mc'?q.o[q.a]:q.t=='tf'?(q.a?'صح':'خطأ'):q.p.map(p=>p[0]+' ← '+p[1]).join('، ');sBad();$('#fb').className='no';$('#fb').textContent='⏰ انتهى الوقت! الإجابة الصحيحة: '+a;fin()}
+function fin(){$('#pb i').style.width=((qi+1)/L[li].q.length*100)+'%';$('#next').hidden=false;$('#next').textContent=qi+1<L[li].q.length?'السؤال التالي ➜':'إنهاء المستوى 🏁';$('#next').focus({preventScroll:true})}
+$('#next').onclick=()=>{qi++;qi<L[li].q.length?startQ():endLevel()};
+function endLevel(){const l=L[li],pass=lp>=50,last=li==L.length-1;sWin();if(pass){stars(24);badges.push(l);$('#lemoji').textContent=l.e;$('#ltitle').textContent='اجتزت المستوى '+(li+1)+'!';$('#ltxt').textContent='جمعت '+lp+' نقطة. حصلت على شارة جديدة:';$('#lbadge').innerHTML=`<div class="badge"><b>${l.e}</b>${l.b}</div>`;$('#lbtn').textContent=last?'اذهب إلى الكنز 💎':'المستوى التالي ➜';$('#lbtn').onclick=()=>{if(last)final();else{li++;intro()}}}
+else{tot-=lp;$('#lemoji').textContent='💪';$('#ltitle').textContent='اقتربت جداً!';$('#ltxt').textContent='جمعت '+lp+' نقطة فقط، والمطلوب 50 نقطة. جرّب المستوى مرة أخرى!';$('#lbadge').innerHTML='';$('#lbtn').textContent='أعد المحاولة 🔁';$('#lbtn').onclick=intro}
+show('lend')}
+function final(){saveScore();$('#ftotal').textContent=tot+' نقطة';$('#fbadges').innerHTML=badges.map(b=>`<div class="badge"><b>${b.e}</b>${b.b}</div>`).join('');stars(30);show('fin')}
+$('#start').onclick=()=>{tone(440,0,.1);$('#pname').value=me;$('#nerr').textContent='';show('nm');$('#pname').focus()};
+$('#nback').onclick=()=>show('home');
+$('#nok').onclick=()=>{const n=$('#pname').value.trim().replace(/\s+/g,' ');if(!n){$('#nerr').textContent='اكتب اسمك أولاً من فضلك';return}me=n;try{localStorage.setItem('pn',n)}catch(e){}newGame()};
+$('#pname').onkeydown=e=>{if(e.key=='Enter')$('#nok').click()};
+$('#go').onclick=startQ;
+$('#again').onclick=()=>{if(me)newGame();else $('#start').click()};
+let me='',sent=false,dbp=null;
+try{me=localStorage.getItem('pn')||''}catch(e){}
+const hid=n=>{n=n.trim().replace(/\s+/g,' ').toLowerCase();let h=5381;for(const c of n)h=((h<<5)+h+c.charCodeAt(0))>>>0;return 'p'+h.toString(16)};
+const getDb=()=>dbp||(dbp=(async()=>{try{return window.claude?await claude.use('db'):null}catch(e){return null}})());
+const lget=()=>{try{return JSON.parse(localStorage.getItem('lb')||'{}')}catch(e){return{}}};
+async function saveScore(){if(sent||!me)return;sent=true;const id=hid(me),e={name:me,score:tot,badges:badges.length,t:Date.now()};
+const l=lget();if(!l[id]||l[id].score<tot){l[id]=e;try{localStorage.setItem('lb',JSON.stringify(l))}catch(x){}}
+const db=await getDb();if(!db)return;
+try{const r=db.doc('leaderboard/'+id),s=await r.get();if(!s.exists||s.data().score<tot)await r.set(e)}catch(x){}}
+async function openLb(){$('#lbl').innerHTML='<p>جارٍ تحميل الترتيب... ⏳</p>';$('#lbn').textContent='';show('lb');let rows=null,shared=false;
+const db=await getDb();
+if(db){try{const q=await db.collection('leaderboard').orderBy('score','desc').limit(50).get();rows=q.docs.map(d=>d.data());shared=true}catch(x){}}
+if(!rows)rows=Object.values(lget());
+rows.sort((a,b)=>b.score-a.score||a.t-b.t);
+const M=['🥇','🥈','🥉'],box=$('#lbl');box.innerHTML='';
+if(!rows.length)box.innerHTML='<p>لا توجد نتائج بعد. كن أول بطل في الترتيب! 🌟</p>';
+rows.forEach((r,i)=>{const d=document.createElement('div');d.className='row'+(i<3?' g'+(i+1):'')+(me&&hid(r.name)==hid(me)?' me':'');
+const a=document.createElement('span');a.className='rk';a.textContent=i<3?M[i]:(i+1);
+const b=document.createElement('span');b.className='nm';b.textContent=r.name;
+const c=document.createElement('span');c.className='pt';c.textContent=r.score+' نقطة';
+d.append(a,b,c);box.appendChild(d)});
+$('#lbn').textContent=shared?'النتائج مشتركة بين جميع الأجهزة.':'تعذّر الاتصال بالقاعدة المشتركة، فهذه نتائج هذا الجهاز فقط.'}
+$('#lbo').onclick=$('#lbo2').onclick=openLb;
+$('#lbb').onclick=()=>show('home');
+</script>
+</body>
+</html>
